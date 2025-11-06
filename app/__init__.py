@@ -57,6 +57,11 @@ def create_app(config_name='default'):
         """Flask-Login user loader callback."""
         return User.query.get(int(user_id))
     
+    # Register blueprints (routes) to the application
+    from app.routes import auth_bp, main_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(main_bp)
+    
     # Register error handlers
     register_error_handlers(app)
     
