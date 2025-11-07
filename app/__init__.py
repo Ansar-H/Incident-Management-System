@@ -162,7 +162,7 @@ def initialize_database():
                     platform='Additiv',
                     journey='Login',
                     clients_affected=1,
-                    priority='P2',
+                    priority='Medium',
                     assigned_team='LCM',
                     status='Open',
                     created_by=user.id
@@ -173,7 +173,7 @@ def initialize_database():
                     platform='Avaloq',
                     journey='Data Sync',
                     clients_affected=5,
-                    priority='P1',
+                    priority='High',
                     assigned_team='DevOps',
                     status='In Progress',
                     created_by=user.id
@@ -184,7 +184,7 @@ def initialize_database():
                     platform='Additiv',
                     journey='Transfer',
                     clients_affected=1,
-                    priority='P3',
+                    priority='Low',
                     assigned_team='Platform Support',
                     status='Open',
                     created_by=admin.id
