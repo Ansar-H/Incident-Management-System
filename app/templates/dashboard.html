@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Incident Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <!-- Welcome Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Welcome back, {{ current_user.username }}! 👋</h2>
+                <p class="text-muted mb-0">
+                    {% if current_user.is_admin %}
+                        <span class="badge bg-danger">Administrator</span>
+                    {% else %}
+                        <span class="badge bg-primary">Helpline User</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <a href="#" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Create New Incident
+                </a>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Total Incidents</h6>
+                        <h2 class="card-title mb-0">3</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">High Priority</h6>
+                        <h2 class="card-title mb-0">1</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Medium Priority</h6>
+                        <h2 class="card-title mb-0">1</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Low Priority</h6>
+                        <h2 class="card-title mb-0">1</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Incidents -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recent Incidents</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Incident list functionality will be implemented in the next development phase.
+                </p>
+                <p class="text-muted mb-0">
+                    <strong>Coming soon:</strong> View, edit, and manage incidents with filtering and search capabilities.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Admin Section (only visible to admins) -->
+        {% if current_user.is_admin %}
+        <div class="card shadow-sm mt-4 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">🔧 Admin Panel</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">You have administrator privileges. Additional features:</p>
+                <ul class="mb-0">
+                    <li>Delete incidents</li>
+                    <li>Manage user accounts</li>
+                    <li>View system analytics</li>
+                    <li>Export incident reports</li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
