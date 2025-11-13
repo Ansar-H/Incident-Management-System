@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Incident Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <!-- Back Button -->
+        <div class="mb-3">
+            <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary">
+                ← Back to List
+            </a>
+        </div>
+        
+        <!-- Incident Detail Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Incident #{{ incident.id }}</h4>
+                    <div>
+                        {% if incident.priority == 'High' %}
+                            <span class="badge bg-danger">High Priority</span>
+                        {% elif incident.priority == 'Medium' %}
+                            <span class="badge bg-warning text-dark">Medium Priority</span>
+                        {% else %}
+                            <span class="badge bg-success">Low Priority</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Title -->
+                <h5 class="card-title mb-4">{{ incident.title }}</h5>
+                
+                <!-- Metadata Grid -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Platform</label>
+                        <p class="mb-0"><strong>{{ incident.platform }}</strong></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Journey</label>
+                        <p class="mb-0"><strong>{{ incident.journey }}</strong></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Assigned Team</label>
+                        <p class="mb-0"><strong>{{ incident.assigned_team }}</strong></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Status</label>
+                        <p class="mb-0">
+                            {% if incident.status == 'Open' %}
+                                <span class="badge bg-info">Open</span>
+                            {% elif incident.status == 'In Progress' %}
+                                <span class="badge bg-primary">In Progress</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ incident.status }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Clients Affected</label>
+                        <p class="mb-0"><strong>{{ incident.clients_affected }}</strong></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Created By</label>
+                        <p class="mb-0"><strong>{{ incident.creator.username }}</strong></p>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="mb-4">
+                    <label class="text-muted small">Description</label>
+                    <div class="p-3 bg-light rounded">
+                        {{ incident.description }}
+                    </div>
+                </div>
+                
+                <!-- Timestamps -->
+                <div class="border-top pt-3">
+                    <div class="row text-muted small">
+                        <div class="col-md-6">
+                            <strong>Created:</strong> {{ incident.created_at.strftime('%d/%m/%Y at %H:%M') }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Last Updated:</strong> {{ incident.updated_at.strftime('%d/%m/%Y at %H:%M') if incident.updated_at else 'N/A' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="#" class="btn btn-primary">Edit</a>
+                        {% if current_user.is_admin %}
+                            <button class="btn btn-danger" disabled>Delete</button>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary">
+                        Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

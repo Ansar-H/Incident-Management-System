@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Incident Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>📋 All Incidents</h2>
+                <p class="text-muted mb-0">
+                    Showing {{ incidents|length }} incident(s)
+                    {% if priority_filter %}
+                        filtered by <strong>{{ priority_filter }}</strong> priority
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <a href="#" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Create New Incident
+                </a>
+            </div>
+        </div>
+        
+        <!-- Priority Filter Badges -->
+        <div class="mb-4">
+            <span class="me-2">Filter by priority:</span>
+            
+            <a href="{{ url_for('incidents.list_incidents') }}" 
+               class="btn btn-sm {{ 'btn-primary' if not priority_filter else 'btn-outline-secondary' }} me-2">
+                All ({{ high_count + medium_count + low_count }})
+            </a>
+            
+            <a href="{{ url_for('incidents.list_incidents', priority='High') }}" 
+               class="btn btn-sm {{ 'btn-danger' if priority_filter == 'High' else 'btn-outline-danger' }} me-2">
+                High ({{ high_count }})
+            </a>
+            
+            <a href="{{ url_for('incidents.list_incidents', priority='Medium') }}" 
+               class="btn btn-sm {{ 'btn-warning' if priority_filter == 'Medium' else 'btn-outline-warning' }} me-2">
+                Medium ({{ medium_count }})
+            </a>
+            
+            <a href="{{ url_for('incidents.list_incidents', priority='Low') }}" 
+               class="btn btn-sm {{ 'btn-success' if priority_filter == 'Low' else 'btn-outline-success' }}">
+                Low ({{ low_count }})
+            </a>
+        </div>
+        
+        <!-- Incidents Table -->
+        {% if incidents %}
+            <div class="card shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Platform</th>
+                                <th>Journey</th>
+                                <th>Priority</th>
+                                <th>Assigned Team</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for incident in incidents %}
+                            <tr>
+                                <td><strong>#{{ incident.id }}</strong></td>
+                                <td>
+                                    <a href="{{ url_for('incidents.view_incident', id=incident.id) }}" 
+                                       class="text-decoration-none">
+                                        {{ incident.title[:50] }}{% if incident.title|length > 50 %}...{% endif %}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ incident.platform }}</span>
+                                </td>
+                                <td>{{ incident.journey }}</td>
+                                <td>
+                                    {% if incident.priority == 'High' %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% elif incident.priority == 'Medium' %}
+                                        <span class="badge bg-warning text-dark">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ incident.assigned_team }}</td>
+                                <td>
+                                    {% if incident.status == 'Open' %}
+                                        <span class="badge bg-info">Open</span>
+                                    {% elif incident.status == 'In Progress' %}
+                                        <span class="badge bg-primary">In Progress</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ incident.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">
+                                    {{ incident.created_at.strftime('%d/%m/%Y %H:%M') }}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('incidents.view_incident', id=incident.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <h5 class="alert-heading">No incidents found</h5>
+                <p class="mb-0">
+                    {% if priority_filter %}
+                        No incidents with <strong>{{ priority_filter }}</strong> priority.
+                        <a href="{{ url_for('incidents.list_incidents') }}" class="alert-link">View all incidents</a>
+                    {% else %}
+                        No incidents have been created yet.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
