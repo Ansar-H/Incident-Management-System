@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Incident Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h2>📝 Create New Incident</h2>
+            <p class="text-muted">
+                Complete the form below. Priority and team assignment will be determined automatically based on your inputs.
+            </p>
+        </div>
+        
+        <!-- Incident Form -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('incidents.create_incident') }}" novalidate>
+                    <!-- CSRF Token -->
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Title Field -->
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label fw-bold") }}
+                        {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.title.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Brief, descriptive title of the incident (10-200 characters)</div>
+                    </div>
+                    
+                    <!-- Platform and Journey (Side by Side) -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.platform.label(class="form-label fw-bold") }}
+                            {{ form.platform(class="form-select" + (" is-invalid" if form.platform.errors else "")) }}
+                            {% if form.platform.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.platform.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.journey.label(class="form-label fw-bold") }}
+                            {{ form.journey(class="form-select" + (" is-invalid" if form.journey.errors else "")) }}
+                            {% if form.journey.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.journey.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Clients Affected -->
+                    <div class="mb-3">
+                        {{ form.clients_affected.label(class="form-label fw-bold") }}
+                        {{ form.clients_affected(class="form-control" + (" is-invalid" if form.clients_affected.errors else ""), type="number", min="1") }}
+                        {% if form.clients_affected.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.clients_affected.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Number of clients experiencing this issue</div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-4">
+                        {{ form.description.label(class="form-label fw-bold") }}
+                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else "")) }}
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Detailed description including error messages, steps to reproduce, and impact (20-2,000 characters)</div>
+                    </div>
+                    
+                    <!-- Info Box -->
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading">🤖 Automatic Classification</h6>
+                        <p class="mb-0 small">
+                            Based on your inputs, the system will automatically:
+                            <ul class="mb-0 mt-2">
+                                <li>Predict incident <strong>priority</strong> (High/Medium/Low)</li>
+                                <li>Assign to the appropriate <strong>resolver team</strong></li>
+                            </ul>
+                        </p>
+                    </div>
+                    
+                    <!-- Submit Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        {{ form.submit(class="btn btn-success btn-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
