@@ -30,7 +30,7 @@
                 <div class="card bg-primary text-white">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2 text-white-50">Total Incidents</h6>
-                        <h2 class="card-title mb-0">3</h2>
+                        <h2 class="card-title mb-0">{{ total_incidents }}</h2>
                     </div>
                 </div>
             </div>
@@ -39,7 +39,7 @@
                 <div class="card bg-danger text-white">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2 text-white-50">High Priority</h6>
-                        <h2 class="card-title mb-0">1</h2>
+                        <h2 class="card-title mb-0">{{ high_priority }}</h2>
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                 <div class="card bg-warning text-white">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2 text-white-50">Medium Priority</h6>
-                        <h2 class="card-title mb-0">1</h2>
+                        <h2 class="card-title mb-0">{{ medium_priority }}</h2>
                     </div>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                 <div class="card bg-success text-white">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2 text-white-50">Low Priority</h6>
-                        <h2 class="card-title mb-0">1</h2>
+                        <h2 class="card-title mb-0">{{ low_priority }}</h2>
                     </div>
                 </div>
             </div>
@@ -65,16 +65,21 @@
         
         <!-- Recent Incidents -->
         <div class="card shadow-sm">
-            <div class="card-header bg-white">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Recent Incidents</h5>
+                <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-sm btn-outline-primary">
+                    View All →
+                </a>
             </div>
             <div class="card-body">
-                <p class="text-muted">
-                    Incident list functionality will be implemented in the next development phase.
+                <p class="text-muted mb-3">
+                    Click "View All" to see the complete incident list with filtering and search capabilities.
                 </p>
-                <p class="text-muted mb-0">
-                    <strong>Coming soon:</strong> View, edit, and manage incidents with filtering and search capabilities.
-                </p>
+                <div class="d-grid">
+                    <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-primary">
+                        📋 Go to Incident List
+                    </a>
+                </div>
             </div>
         </div>
         

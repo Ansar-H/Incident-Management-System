@@ -91,9 +91,18 @@
             <div class="card-footer bg-white">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <a href="#" class="btn btn-primary">Edit</a>
+                        <!-- Edit button - visible if user owns incident or is admin -->
+                        {% if current_user.id == incident.created_by or current_user.is_admin %}
+                            <a href="{{ url_for('incidents.edit_incident', id=incident.id) }}" class="btn btn-primary">
+                                Edit
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Delete button - admin only with confirmation modal -->
                         {% if current_user.is_admin %}
-                            <button class="btn btn-danger" disabled>Delete</button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                Delete
+                            </button>
                         {% endif %}
                     </div>
                     <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary">
@@ -104,4 +113,31 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal (OWASP - Prevent accidental deletion) -->
+{% if current_user.is_admin %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">⚠️ Confirm Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>Incident #{{ incident.id }}</strong>?</p>
+                <p class="text-danger mb-0">
+                    <strong>Warning:</strong> This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ url_for('incidents.delete_incident', id=incident.id) }}" style="display: inline;">
+                    {{ form.csrf_token }}
+                    <button type="submit" class="btn btn-danger">Delete Incident</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

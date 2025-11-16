@@ -19,4 +19,19 @@ def index():
 @login_required
 def dashboard():
     """User dashboard - requires login."""
-    return render_template('dashboard.html', title='Dashboard')
+    from app.models.incident import Incident
+    
+    # Get incident counts by priority
+    total_incidents = Incident.query.count()
+    high_priority = Incident.query.filter_by(priority='High').count()
+    medium_priority = Incident.query.filter_by(priority='Medium').count()
+    low_priority = Incident.query.filter_by(priority='Low').count()
+    
+    return render_template(
+        'dashboard.html',
+        title='Dashboard',
+        total_incidents=total_incidents,
+        high_priority=high_priority,
+        medium_priority=medium_priority,
+        low_priority=low_priority
+    )

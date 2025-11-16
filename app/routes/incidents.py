@@ -54,11 +54,15 @@ def view_incident(id):
     View detailed information about a specific incident.
     Accessible to all authenticated users.
     """
+    from flask_wtf import FlaskForm
+    
     incident = Incident.query.get_or_404(id)
+    form = FlaskForm()  # Create empty form just for CSRF token
     
     return render_template(
         'incidents/detail.html',
         incident=incident,
+        form=form,  # Pass form to template
         title=f'Incident #{incident.id}'
     )
 
@@ -115,3 +119,83 @@ def create_incident():
         form=form,
         title='Create New Incident'
     )
+
+@bp.route('/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_incident(id):
+    """
+    Edit an existing incident.
+    Users can edit their own incidents, admins can edit any incident.
+    """
+    from app.forms.incident_forms import IncidentForm
+    from app.utils.classifier import predict_priority
+    from app.utils.router import assign_team
+    
+    incident = Incident.query.get_or_404(id)
+    
+    # Check permissions: users can edit their own, admins can edit any
+    if not current_user.is_admin and incident.created_by != current_user.id:
+        flash('You do not have permission to edit this incident.', 'danger')
+        return redirect(url_for('incidents.list_incidents'))
+    
+    form = IncidentForm()
+    
+    if form.validate_on_submit():
+        # Update incident fields
+        incident.title = form.title.data
+        incident.platform = form.platform.data
+        incident.journey = form.journey.data
+        incident.clients_affected = form.clients_affected.data
+        incident.description = form.description.data
+        
+        # Recalculate priority and team based on updated data
+        incident.priority = predict_priority(
+            platform=form.platform.data,
+            journey=form.journey.data,
+            clients_affected=form.clients_affected.data,
+            description=form.description.data
+        )
+        
+        incident.assigned_team = assign_team(
+            platform=form.platform.data,
+            journey=form.journey.data,
+            description=form.description.data
+        )
+        
+        db.session.commit()
+        
+        flash(f'Incident #{incident.id} updated successfully! Priority: {incident.priority}, Assigned to: {incident.assigned_team}', 'success')
+        return redirect(url_for('incidents.view_incident', id=incident.id))
+    
+    # Pre-populate form with existing data
+    if request.method == 'GET':
+        form.title.data = incident.title
+        form.platform.data = incident.platform
+        form.journey.data = incident.journey
+        form.clients_affected.data = incident.clients_affected
+        form.description.data = incident.description
+    
+    return render_template(
+        'incidents/edit.html',
+        form=form,
+        incident=incident,
+        title=f'Edit Incident #{incident.id}'
+    )
+
+
+@bp.route('/<int:id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_incident(id):
+    """
+    Delete an incident (admin only).
+    Uses POST method to prevent CSRF attacks.
+    """
+    incident = Incident.query.get_or_404(id)
+    
+    incident_id = incident.id
+    db.session.delete(incident)
+    db.session.commit()
+    
+    flash(f'Incident #{incident_id} has been deleted successfully.', 'success')
+    return redirect(url_for('incidents.list_incidents'))

@@ -66,3 +66,10 @@ class IncidentForm(FlaskForm):
     )
     
     submit = SubmitField('Create Incident')
+
+class EditIncidentForm(IncidentForm):
+    """
+    Form for editing incidents.
+    Inherits from IncidentForm but changes the submit button text.
+    """
+    submit = SubmitField('Update Incident')

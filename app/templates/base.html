@@ -57,6 +57,10 @@
                             <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
                         </li>
                         
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('incidents.list_incidents') }}">Incidents</a>
+                        </li>
+                        
                         {% if current_user.is_admin %}
                             <!-- Admin-only links -->
                             <li class="nav-item">
