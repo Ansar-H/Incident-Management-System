@@ -13,12 +13,68 @@
             </p>
         </div>
         
+        <!-- Duplicate Warning (if similar incidents found) -->
+        {% if duplicates %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading">⚠️ Potential Duplicate Incidents Detected</h5>
+            <p class="mb-3">
+                We found <strong>{{ duplicates|length }}</strong> similar incident(s) that may be related to this issue.
+                Please review them before creating a new incident.
+            </p>
+            
+            <!-- Similar Incidents List -->
+            <div class="list-group mb-3">
+                {% for incident, similarity in duplicates %}
+                <a href="{{ url_for('incidents.view_incident', id=incident.id) }}" target="_blank" 
+                   class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">
+                                <span class="badge bg-secondary">#{{ incident.id }}</span>
+                                {{ incident.title }}
+                            </h6>
+                            <p class="mb-1 small text-muted">
+                                {{ incident.description[:100] }}{% if incident.description|length > 100 %}...{% endif %}
+                            </p>
+                            <small class="text-muted">
+                                Platform: {{ incident.platform }} | 
+                                Status: {{ incident.status }} |
+                                Created: {{ incident.created_at.strftime('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-info">{{ (similarity * 100)|round|int }}% similar</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            
+            <hr>
+            <p class="mb-0">
+                <strong>What would you like to do?</strong>
+            </p>
+            <div class="mt-2">
+                <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-secondary me-2">
+                    Cancel & Review Existing
+                </a>
+                <button type="button" class="btn btn-warning" onclick="document.getElementById('confirm_create').value='yes'; document.getElementById('incident_form').submit();">
+                    Create Anyway
+                </button>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        
         <!-- Incident Form -->
         <div class="card shadow-sm">
             <div class="card-body">
-                <form method="POST" action="{{ url_for('incidents.create_incident') }}" novalidate>
+                <form method="POST" action="{{ url_for('incidents.create_incident') }}" novalidate id="incident_form">
                     <!-- CSRF Token -->
                     {{ form.hidden_tag() }}
+                    
+                    <!-- Hidden field for duplicate confirmation -->
+                    <input type="hidden" name="confirm_create" id="confirm_create" value="no">
                     
                     <!-- Title Field -->
                     <div class="mb-3">
@@ -85,6 +141,7 @@
                         <p class="mb-0 small">
                             Based on your inputs, the system will automatically:
                             <ul class="mb-0 mt-2">
+                                <li>Check for <strong>duplicate incidents</strong> using NLP text similarity</li>
                                 <li>Predict incident <strong>priority</strong> (High/Medium/Low)</li>
                                 <li>Assign to the appropriate <strong>resolver team</strong></li>
                             </ul>

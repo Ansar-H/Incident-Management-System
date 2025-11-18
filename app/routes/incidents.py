@@ -71,52 +71,104 @@ def view_incident(id):
 def create_incident():
     """
     Create a new incident with automatic priority and team assignment.
-    Accessible to all authenticated users.
+    Checks for potential duplicates before creation.
     """
     from app.forms.incident_forms import IncidentForm
     from app.utils.classifier import predict_priority
     from app.utils.router import assign_team
+    from app.utils.duplicate_detector import DuplicateDetector
     
     form = IncidentForm()
     
+    # Check for duplicates on form submission
+    duplicates = None
     if form.validate_on_submit():
-        # Automatic priority prediction
-        predicted_priority = predict_priority(
-            platform=form.platform.data,
-            journey=form.journey.data,
-            clients_affected=form.clients_affected.data,
-            description=form.description.data
-        )
-        
-        # Automatic team assignment
-        assigned_team = assign_team(
-            platform=form.platform.data,
-            journey=form.journey.data,
-            description=form.description.data
-        )
-        
-        # Create new incident
-        incident = Incident(
+        # Check for similar existing incidents
+        duplicate_check = DuplicateDetector.check_for_duplicates(
             title=form.title.data,
-            platform=form.platform.data,
-            journey=form.journey.data,
-            clients_affected=form.clients_affected.data,
             description=form.description.data,
-            priority=predicted_priority,
-            assigned_team=assigned_team,
-            status='Open',
-            created_by=current_user.id
+            platform=form.platform.data,
+            threshold=0.6
         )
         
-        db.session.add(incident)
-        db.session.commit()
+        # If duplicates found, show warning but allow creation
+        if duplicate_check['is_duplicate']:
+            duplicates = duplicate_check['similar_incidents']
+            
+            # If user confirmed creation despite warning
+            if request.form.get('confirm_create') == 'yes':
+                # Proceed with creation
+                predicted_priority = predict_priority(
+                    platform=form.platform.data,
+                    journey=form.journey.data,
+                    clients_affected=form.clients_affected.data,
+                    description=form.description.data
+                )
+                
+                assigned_team = assign_team(
+                    platform=form.platform.data,
+                    journey=form.journey.data,
+                    description=form.description.data
+                )
+                
+                incident = Incident(
+                    title=form.title.data,
+                    platform=form.platform.data,
+                    journey=form.journey.data,
+                    clients_affected=form.clients_affected.data,
+                    description=form.description.data,
+                    priority=predicted_priority,
+                    assigned_team=assigned_team,
+                    status='Open',
+                    created_by=current_user.id
+                )
+                
+                db.session.add(incident)
+                db.session.commit()
+                
+                flash(f'Incident #{incident.id} created successfully! Priority: {predicted_priority}, Assigned to: {assigned_team}', 'success')
+                return redirect(url_for('incidents.view_incident', id=incident.id))
+            
+            # Show duplicate warning (will render form with warnings)
+            flash('Potential duplicate incidents detected. Please review before creating.', 'warning')
         
-        flash(f'Incident #{incident.id} created successfully! Priority: {predicted_priority}, Assigned to: {assigned_team}', 'success')
-        return redirect(url_for('incidents.view_incident', id=incident.id))
+        else:
+            # No duplicates - create incident immediately
+            predicted_priority = predict_priority(
+                platform=form.platform.data,
+                journey=form.journey.data,
+                clients_affected=form.clients_affected.data,
+                description=form.description.data
+            )
+            
+            assigned_team = assign_team(
+                platform=form.platform.data,
+                journey=form.journey.data,
+                description=form.description.data
+            )
+            
+            incident = Incident(
+                title=form.title.data,
+                platform=form.platform.data,
+                journey=form.journey.data,
+                clients_affected=form.clients_affected.data,
+                description=form.description.data,
+                priority=predicted_priority,
+                assigned_team=assigned_team,
+                status='Open',
+                created_by=current_user.id
+            )
+            
+            db.session.add(incident)
+            db.session.commit()
+            
+            flash(f'Incident #{incident.id} created successfully! Priority: {predicted_priority}, Assigned to: {assigned_team}', 'success')
+            return redirect(url_for('incidents.view_incident', id=incident.id))
     
     return render_template(
         'incidents/create.html',
         form=form,
+        duplicates=duplicates,
         title='Create New Incident'
     )
 
