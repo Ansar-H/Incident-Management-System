@@ -88,7 +88,7 @@ def create_incident():
             title=form.title.data,
             description=form.description.data,
             platform=form.platform.data,
-            threshold=0.6
+            threshold=0.50
         )
         
         # If duplicates found, show warning but allow creation
@@ -129,7 +129,7 @@ def create_incident():
                 flash(f'Incident #{incident.id} created successfully! Priority: {predicted_priority}, Assigned to: {assigned_team}', 'success')
                 return redirect(url_for('incidents.view_incident', id=incident.id))
             
-            # Show duplicate warning (will render form with warnings)
+            # Show duplicate warning (will render the form with warnings)
             flash('Potential duplicate incidents detected. Please review before creating.', 'warning')
         
         else:
