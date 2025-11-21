@@ -90,3 +90,12 @@ def client(app):
 def runner(app):
     """Test CLI runner."""
     return app.test_cli_runner()
+
+@pytest.fixture
+def sample_incident(app):
+    """Get the sample incident created in app fixture."""
+    with app.app_context():
+        incident = Incident.query.filter_by(
+            title='Test incident for unit testing'
+        ).first()
+        return incident
