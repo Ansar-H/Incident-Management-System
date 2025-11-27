@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Incident Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Admin Dashboard</h2>
+                <p class="text-muted mb-0">Welcome, {{ current_user.username }}</p>
+            </div>
+            <div>
+                <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-primary">
+                    View All Incidents
+                </a>
+            </div>
+        </div>
+
+        <!-- Key Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Total Incidents</h6>
+                        <h2 class="card-title mb-0">{{ total_incidents }}</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Open</h6>
+                        <h2 class="card-title mb-0">{{ open_incidents }}</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">High Priority</h6>
+                        <h2 class="card-title mb-0">{{ high_priority }}</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Total Users</h6>
+                        <h2 class="card-title mb-0">{{ total_users }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Incidents -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recent Incidents</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_incidents %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for incident in recent_incidents %}
+                            <tr>
+                                <td><strong>#{{ incident.id }}</strong></td>
+                                <td>
+                                    <a href="{{ url_for('incidents.view_incident', id=incident.id) }}" class="text-decoration-none">
+                                        {{ incident.title[:60] }}{% if incident.title|length > 60 %}...{% endif %}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if incident.priority == 'High' %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% elif incident.priority == 'Medium' %}
+                                        <span class="badge bg-warning">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if incident.status == 'Open' %}
+                                        <span class="badge bg-warning">Open</span>
+                                    {% elif incident.status == 'In Progress' %}
+                                        <span class="badge bg-info">In Progress</span>
+                                    {% elif incident.status == 'Resolved' %}
+                                        <span class="badge bg-success">Resolved</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ incident.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><small class="text-muted">{{ incident.created_at.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                                <td>
+                                    <a href="{{ url_for('incidents.view_incident', id=incident.id) }}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No incidents found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
