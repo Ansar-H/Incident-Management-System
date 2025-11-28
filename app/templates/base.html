@@ -10,6 +10,57 @@
     
     <!-- Custom CSS -->
     <style>
+        :root {
+            /* NatWest Purple Theme - Override Bootstrap primary color */
+            --bs-primary: #6A1B9A;
+            --bs-primary-rgb: 106, 27, 154;
+            --bs-primary-dark: #4A148C;
+            --bs-primary-light: #9C27B0;
+        }
+        
+        /* Override Bootstrap primary color */
+        .bg-primary {
+            background-color: #6A1B9A !important;
+        }
+        
+        .btn-primary {
+            background-color: #6A1B9A;
+            border-color: #6A1B9A;
+        }
+        
+        .btn-primary:hover {
+            background-color: #4A148C;
+            border-color: #4A148C;
+        }
+        
+        .btn-primary:focus, .btn-primary:active {
+            background-color: #4A148C;
+            border-color: #4A148C;
+        }
+        
+        .btn-outline-primary {
+            color: #6A1B9A;
+            border-color: #6A1B9A;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: #6A1B9A;
+            border-color: #6A1B9A;
+            color: white;
+        }
+        
+        .text-primary {
+            color: #6A1B9A !important;
+        }
+        
+        .navbar-dark.bg-primary {
+            background-color: #6A1B9A !important;
+        }
+        
+        .border-primary {
+            border-color: #6A1B9A !important;
+        }
+        
         body {
             min-height: 100vh;
             display: flex;
