@@ -4,31 +4,24 @@ Provides reusable test setup including test client and database.
 """
 
 import pytest
-from flask import Flask
-from app import db
+from app import create_app, db
 from app.models.user import User
 from app.models.incident import Incident
 from werkzeug.security import generate_password_hash
-from config import Config
 
 
 @pytest.fixture
 def app():
     """Create and configure test application."""
-    # Create Flask app directly
-    test_app = Flask(__name__)
+    # Using the app factory to ensure all blueprints are registered
+    test_app = create_app('testing')
     
-    # Configure for testing
-    test_app.config['TESTING'] = True
+    # Override database URI to use in-memory database for faster tests
     test_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    test_app.config['WTF_CSRF_ENABLED'] = False
-    test_app.config['SECRET_KEY'] = 'test-secret-key'
-    test_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # Initialise extensions
-    db.init_app(test_app)
     
     with test_app.app_context():
+        # Drop all tables first (in case the app factory created them)
+        db.drop_all()
         # Create all tables
         db.create_all()
         
