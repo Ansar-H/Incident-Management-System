@@ -49,6 +49,15 @@ def app():
             is_admin=False
         )
         db.session.add(incident_user)
+        
+        # Create helpline_user for security tests
+        helpline_user = User(
+            username='helpline_user',
+            email='helpline@example.com',
+            password_hash=generate_password_hash('Helpline123!'),
+            is_admin=False
+        )
+        db.session.add(helpline_user)
         db.session.commit()
         
         # Create sample incident

@@ -26,8 +26,14 @@ jobs:
         
     - name: Run smoke tests
       run: |
-        pytest -v tests/test_models.py -k "test_" --maxfail=5
+        pytest -v tests/test_smoke.py --maxfail=5
         
-    - name: Run full test suite
+    - name: Run full test suite with coverage
       run: |
-        pytest -v
+        pytest -v --cov=app --cov-report=term-missing --cov-report=html
+        
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./htmlcov/index.html
+        fail_ci_if_error: false
