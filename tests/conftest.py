@@ -67,8 +67,15 @@ def app():
             journey='Login',
             clients_affected=5,
             description='This is a test incident created for automated testing purposes.',
+            # NEW: Add predicted values
+            predicted_priority='Medium',
+            predicted_team='LCM',
+            duplicate_flag=False,
+            duplicate_score=None,
+            # Final values
             priority='Medium',
             assigned_team='LCM',
+            is_overridden=False,
             status='Open',
             created_by=incident_user.id
         )
