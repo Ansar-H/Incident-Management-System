@@ -66,6 +66,19 @@
                         <label class="text-muted small">Created By</label>
                         <p class="mb-0"><strong>{{ incident.creator.username }}</strong></p>
                     </div>
+                    <!-- New field for override -->
+                    <div class="col-md-12 mb-3">
+                        <label class="text-muted small">Triage Information</label>
+                        <p class="mb-0">
+                            <strong>Predicted:</strong> {{ incident.predicted_priority }} / {{ incident.predicted_team }}
+                            {% if incident.is_overridden %}
+                                <span class="badge bg-warning text-dark ms-2">Overridden</span>
+                            {% endif %}
+                            {% if incident.duplicate_flag %}
+                                <span class="badge bg-danger ms-2">Potential Duplicate</span>
+                            {% endif %}
+                        </p>
+                    </div>
                 </div>
                 
                 <!-- Description -->
@@ -95,6 +108,13 @@
                         {% if current_user.id == incident.created_by or current_user.is_admin %}
                             <a href="{{ url_for('incidents.edit_incident', id=incident.id) }}" class="btn btn-primary">
                                 Edit
+                            </a>
+                        {% endif %}
+
+                        <!-- New Override button - admin only -->
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('incidents.override_incident', id=incident.id) }}" class="btn btn-warning">
+                                ⚙️ Override Triage
                             </a>
                         {% endif %}
                         

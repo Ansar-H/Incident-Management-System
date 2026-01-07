@@ -110,6 +110,9 @@ def create_incident():
                     journey=form.journey.data,
                     description=form.description.data
                 )
+
+                duplicate_flag = duplicate_check['is_duplicate']
+                duplicate_score = duplicate_check['similar_incidents'][0][1] if duplicate_flag and len(duplicate_check['similar_incidents']) > 0 else None
                 
                 incident = Incident(
                     title=form.title.data,
@@ -117,8 +120,15 @@ def create_incident():
                     journey=form.journey.data,
                     clients_affected=form.clients_affected.data,
                     description=form.description.data,
+                    # Store predictions
+                    predicted_priority=predicted_priority,
+                    predicted_team=assigned_team,
+                    duplicate_flag=duplicate_flag,
+                    duplicate_score=duplicate_score,
+                    # Final values
                     priority=predicted_priority,
                     assigned_team=assigned_team,
+                    is_overridden=False,
                     status='Open',
                     created_by=current_user.id
                 )
@@ -153,8 +163,15 @@ def create_incident():
                 journey=form.journey.data,
                 clients_affected=form.clients_affected.data,
                 description=form.description.data,
+                # Store predictions
+                predicted_priority=predicted_priority,
+                predicted_team=assigned_team,
+                duplicate_flag=False,  # No duplicates in this path
+                duplicate_score=None,
+                # Final values
                 priority=predicted_priority,
                 assigned_team=assigned_team,
+                is_overridden=False,
                 status='Open',
                 created_by=current_user.id
             )
@@ -251,3 +268,71 @@ def delete_incident(id):
     
     flash(f'Incident #{incident_id} has been deleted successfully.', 'success')
     return redirect(url_for('incidents.list_incidents'))
+
+# New incident override functionality
+@bp.route('/<int:id>/override', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def override_incident(id):
+    """
+    Override triage decision for an incident (admin only).
+    Creates an audit log entry for governance.
+    """
+    from app.forms.override_forms import OverrideForm
+    from app.models.audit_log import AuditLog
+    
+    incident = Incident.query.get_or_404(id)
+    form = OverrideForm()
+    
+    if form.validate_on_submit():
+        # Track what changed
+        old_priority = incident.priority
+        old_team = incident.assigned_team
+        new_priority = form.new_priority.data
+        new_team = form.new_team.data
+        
+        # Determine what changed
+        priority_changed = old_priority != new_priority
+        team_changed = old_team != new_team
+        
+        if priority_changed or team_changed:
+            field_changed = 'both' if (priority_changed and team_changed) else ('priority' if priority_changed else 'team')
+        else:
+            flash('No changes detected - values are the same.', 'warning')
+            return redirect(url_for('incidents.view_incident', id=incident.id))
+        
+        # Update incident
+        incident.priority = new_priority
+        incident.assigned_team = new_team
+        incident.is_overridden = True
+        
+        # Create audit log entry
+        audit_entry = AuditLog(
+            incident_id=incident.id,
+            field_changed=field_changed,
+            old_priority=old_priority if priority_changed else None,
+            new_priority=new_priority if priority_changed else None,
+            old_team=old_team if team_changed else None,
+            new_team=new_team if team_changed else None,
+            reason_code=form.reason_code.data,
+            comment=form.comment.data if form.comment.data else None,
+            changed_by_user_id=current_user.id
+        )
+        
+        db.session.add(audit_entry)
+        db.session.commit()
+        
+        flash(f'Incident #{incident.id} override successful! Priority: {new_priority}, Team: {new_team}', 'success')
+        return redirect(url_for('incidents.view_incident', id=incident.id))
+    
+    # Pre-populate form with current values
+    if request.method == 'GET':
+        form.new_priority.data = incident.priority
+        form.new_team.data = incident.assigned_team
+    
+    return render_template(
+        'incidents/override.html',
+        form=form,
+        incident=incident,
+        title=f'Override Incident #{incident.id}'
+    )

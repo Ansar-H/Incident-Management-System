@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Incident Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <!-- Back Button -->
+        <div class="mb-3">
+            <a href="{{ url_for('incidents.view_incident', id=incident.id) }}" class="btn btn-outline-secondary">
+                ← Back to Incident
+            </a>
+        </div>
+        
+        <!-- Override Form Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">⚠️ Override Triage Decision</h4>
+            </div>
+            <div class="card-body">
+                <!-- Current Values Display -->
+                <div class="alert alert-info mb-4">
+                    <h6 class="alert-heading">Current Triage Results:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Predicted Priority:</strong> {{ incident.predicted_priority }}<br>
+                            <strong>Current Priority:</strong> 
+                            <span class="badge {% if incident.priority == 'High' %}bg-danger{% elif incident.priority == 'Medium' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                                {{ incident.priority }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Predicted Team:</strong> {{ incident.predicted_team }}<br>
+                            <strong>Current Team:</strong> <span class="badge bg-primary">{{ incident.assigned_team }}</span>
+                        </div>
+                    </div>
+                    {% if incident.is_overridden %}
+                        <div class="mt-2">
+                            <span class="badge bg-warning text-dark">Previously Overridden</span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Override Form -->
+                <form method="POST" novalidate>
+                    {{ form.csrf_token }}
+                    
+                    <!-- New Priority -->
+                    <div class="mb-3">
+                        {{ form.new_priority.label(class="form-label") }}
+                        {{ form.new_priority(class="form-select") }}
+                        {% if form.new_priority.errors %}
+                            <div class="text-danger small">{{ form.new_priority.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- New Team -->
+                    <div class="mb-3">
+                        {{ form.new_team.label(class="form-label") }}
+                        {{ form.new_team(class="form-select") }}
+                        {% if form.new_team.errors %}
+                            <div class="text-danger small">{{ form.new_team.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Reason Code -->
+                    <div class="mb-3">
+                        {{ form.reason_code.label(class="form-label") }}
+                        {{ form.reason_code(class="form-select") }}
+                        {% if form.reason_code.errors %}
+                            <div class="text-danger small">{{ form.reason_code.errors[0] }}</div>
+                        {% endif %}
+                        <div class="form-text">Select the primary reason for this override</div>
+                    </div>
+                    
+                    <!-- Comment -->
+                    <div class="mb-3">
+                        {{ form.comment.label(class="form-label") }}
+                        {{ form.comment(class="form-control") }}
+                        {% if form.comment.errors %}
+                            <div class="text-danger small">{{ form.comment.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Submit Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('incidents.view_incident', id=incident.id) }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-warning">
+                            Submit Override
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

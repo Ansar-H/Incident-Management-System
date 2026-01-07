@@ -6,7 +6,6 @@ Stores incident details with foreign key to User (creator).
 from app import db
 from datetime import datetime
 
-
 class Incident(db.Model):
     """Incident model for helpline support tickets."""
     
@@ -21,9 +20,19 @@ class Incident(db.Model):
     journey = db.Column(db.String(100), nullable=False)  # e.g., "Login", "Transfer"
     clients_affected = db.Column(db.Integer, default=1)
     
-    # Classification
-    priority = db.Column(db.String(10), nullable=False)  # P1, P2, P3, P4
+    # ===== NEW: Triage predictions (what the ML/rules predicted) =====
+    predicted_priority = db.Column(db.String(10), nullable=False)
+    predicted_team = db.Column(db.String(50), nullable=False)
+    duplicate_flag = db.Column(db.Boolean, default=False, nullable=False)
+    duplicate_score = db.Column(db.Float, nullable=True)  # Optional: highest similarity score
+    
+    # ===== Classification =====
+    priority = db.Column(db.String(10), nullable=False)  # High, Medium, Low
     assigned_team = db.Column(db.String(50), nullable=False)  # LCM, DevOps, etc.
+    
+    # ===== NEW: Override tracking =====
+    is_overridden = db.Column(db.Boolean, default=False, nullable=False)
+    
     status = db.Column(db.String(20), default='Open', nullable=False)  # Open, In Progress, Resolved
     
     # Timestamps
