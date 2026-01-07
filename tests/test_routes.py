@@ -110,8 +110,15 @@ def test_stored_xss_payload_is_escaped(client, app):
             journey='Login',
             clients_affected=1,
             description=xss_payload,
+            # Add predicted values
+            predicted_priority='Medium',
+            predicted_team='LCM',
+            duplicate_flag=False,
+            duplicate_score=None,
+            # Final values
             priority='Medium',
             assigned_team='LCM',
+            is_overridden=False,
             status='Open',
             created_by=user.id
         )
