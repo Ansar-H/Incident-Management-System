@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Incident Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-lg-11 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>📋 Audit Log - Override History</h2>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+        </div>
+        
+        {% if logs %}
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Incident ID</th>
+                                    <th>Changed By</th>
+                                    <th>Field Changed</th>
+                                    <th>Old → New</th>
+                                    <th>Reason</th>
+                                    <th>Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td class="small">{{ log.changed_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('incidents.view_incident', id=log.incident_id) }}" class="text-decoration-none">
+                                            #{{ log.incident_id }}
+                                        </a>
+                                    </td>
+                                    <td>{{ log.changed_by.username }}</td>
+                                    <td>
+                                        {% if log.field_changed == 'both' %}
+                                            <span class="badge bg-primary">Priority & Team</span>
+                                        {% elif log.field_changed == 'priority' %}
+                                            <span class="badge bg-warning text-dark">Priority</span>
+                                        {% else %}
+                                            <span class="badge bg-info">Team</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="small">
+                                        {% if log.old_priority %}
+                                            <strong>Priority:</strong> {{ log.old_priority }} → {{ log.new_priority }}<br>
+                                        {% endif %}
+                                        {% if log.old_team %}
+                                            <strong>Team:</strong> {{ log.old_team }} → {{ log.new_team }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="small">
+                                        {% if log.reason_code == 'incorrect_platform_detection' %}
+                                            Incorrect platform/journey
+                                        {% elif log.reason_code == 'keyword_misclassification' %}
+                                            Keyword misclassification
+                                        {% elif log.reason_code == 'edge_case' %}
+                                            Edge case
+                                        {% elif log.reason_code == 'business_impact' %}
+                                            Business impact
+                                        {% else %}
+                                            Other
+                                        {% endif %}
+                                    </td>
+                                    <td class="small">{{ log.comment if log.comment else '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <strong>No override actions recorded yet.</strong>
+                <p class="mb-0">When admins override triage decisions, they will appear here for audit purposes.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

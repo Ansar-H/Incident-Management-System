@@ -336,3 +336,22 @@ def override_incident(id):
         incident=incident,
         title=f'Override Incident #{incident.id}'
     )
+
+@bp.route('/audit-log')
+@login_required
+@admin_required
+def audit_log():
+    """
+    View audit log of all override actions (admin only).
+    Provides governance and traceability.
+    """
+    from app.models.audit_log import AuditLog
+    
+    # Get all audit logs, newest first
+    logs = AuditLog.query.order_by(AuditLog.changed_at.desc()).all()
+    
+    return render_template(
+        'incidents/audit_log.html',
+        logs=logs,
+        title='Audit Log - Override History'
+    )
