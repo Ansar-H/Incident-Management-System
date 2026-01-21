@@ -33,10 +33,21 @@ def reset_database():
         )
         db.session.add(admin)
         db.session.commit()
+
         
-        print("\n👤 Test admin user created:")
-        print("  Username: admin")
-        print("  Password: Admin123!")
+        # Standard helpline user
+        helpline_user = User(
+            username='helpline_user',
+            email='helpline@example.com',
+            password_hash=generate_password_hash('User123!'),
+            is_admin=False
+        )
+        db.session.add(helpline_user)
+        db.session.commit()
+
+        print("\n👤 Test users created:")
+        print("  Admin: admin / Admin123!")
+        print("  User:  helpline_user / User123!")
 
 if __name__ == '__main__':
     reset_database()
