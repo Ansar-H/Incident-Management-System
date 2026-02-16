@@ -58,7 +58,7 @@
                 <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-secondary me-2">
                     Cancel & Review Existing
                 </a>
-                <button type="button" class="btn btn-warning" onclick="document.getElementById('confirm_create').value='yes'; document.getElementById('incident_form').submit();">
+                <button type="button" class="btn btn-warning" onclick="document.getElementById('confirm_create').value='yes'; HTMLFormElement.prototype.submit.call(document.getElementById('incident_form'));">
                     Create Anyway
                 </button>
             </div>

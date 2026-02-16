@@ -58,13 +58,13 @@ def test_additiv_payment_routes_to_devops():
 
 
 def test_additiv_api_keyword_routes_to_additiv_support():
-    """Test API-related keywords route to Additiv Support."""
+    """Test API-related keywords route to Additiv LCM."""
     team = assign_team(
         platform='Additiv',
         journey='Balance View',
         description='API endpoint returning 500 error'
     )
-    assert team == 'Additiv Support'
+    assert team == 'Additiv LCM'
 
 
 def test_avaloq_database_keyword_routing():
@@ -94,7 +94,7 @@ def test_additiv_transfer_routing():
         journey='Transfer',
         description='Transfer confirmation not showing'
     )
-    assert team == 'Additiv Support'
+    assert team == 'Additiv LCM'
 
 
 def test_routing_consistency():

@@ -114,7 +114,7 @@
                         <!-- New Override button - admin only -->
                         {% if current_user.is_admin %}
                             <a href="{{ url_for('incidents.override_incident', id=incident.id) }}" class="btn btn-warning">
-                                ⚙️ Override Triage
+                                Override Triage
                             </a>
                         {% endif %}
                         

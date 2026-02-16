@@ -28,7 +28,7 @@ class OverrideForm(FlaskForm):
             ('', '-- Select Team --'),
             ('LCM', 'LCM'),
             ('DevOps', 'DevOps'),
-            ('Additiv Support', 'Additiv Support'),
+            ('Additiv LCM', 'Additiv LCM'),
             ('Avaloq Support', 'Avaloq Support'),
             ('Platform Support', 'Platform Support')
         ],

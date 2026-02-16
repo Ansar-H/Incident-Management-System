@@ -14,7 +14,7 @@ def assign_team(platform, journey, description):
         description (str): Incident description text
     
     Returns:
-        str: Team name (LCM, DevOps, Additiv Support, Avaloq Support, Platform Support)
+        str: Team name (LCM, DevOps, Additiv LCM, Avaloq Support, Platform Support)
     
     Routing Rules:
     - Authentication issues → LCM
@@ -47,9 +47,9 @@ def assign_team(platform, journey, description):
     if platform == 'Additiv':
         # Transaction issues on Additiv
         if journey in ['Transfer', 'Payment'] or any(keyword in description_lower for keyword in transaction_keywords):
-            return 'Additiv Support'
+            return 'Additiv LCM'
         # Other Additiv issues
-        return 'Additiv Support'
+        return 'Additiv LCM'
     
     elif platform == 'Avaloq':
         # Transaction issues on Avaloq
