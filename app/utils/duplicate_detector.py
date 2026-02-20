@@ -27,9 +27,6 @@ class DuplicateDetector:
         Returns:
             list: List of tuples (Incident object, similarity_score)
         """
-        # Combine title and description for comparison
-        new_text = f"{title} {description}"
-        
         # Get recent open incidents on same platform
         existing_incidents = Incident.query.filter_by(
             platform=platform,
@@ -39,9 +36,10 @@ class DuplicateDetector:
         # Calculate similarity scores
         similar_incidents = []
         for incident in existing_incidents:
-            existing_text = f"{incident.title} {incident.description}"
-            
-            similarity = TextProcessor.calculate_similarity(new_text, existing_text)
+            # Compare title and description separately with weighted scoring
+            title_sim = TextProcessor.calculate_similarity(title, incident.title)
+            desc_sim = TextProcessor.calculate_similarity(description, incident.description)
+            similarity = (0.25 * title_sim) + (0.75 * desc_sim)
             
             if similarity >= threshold:
                 similar_incidents.append((incident, similarity))
